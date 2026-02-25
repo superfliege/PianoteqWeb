@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Pianoteq Remote</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== Status Bar ===== -->
+  <header id="status-bar">
+    <div class="status-left">
+      <span class="logo">&#9835; Pianoteq</span>
+    </div>
+    <div class="status-center" id="current-preset" title="Current preset">—</div>
+    <div class="status-right">
+      <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
+
+  <!-- ===== Connection indicator ===== -->
+  <div id="connection-banner" class="banner hidden"></div>
+
+  <!-- ===== Loading overlay ===== -->
+  <div id="loading-overlay" class="hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ===== Navigation Tabs ===== -->
+  <nav id="tab-bar">
+    <button class="tab active" data-tab="presets">Presets</button>
+    <button class="tab" data-tab="sound">Sound</button>
+    <button class="tab" data-tab="playback">Playback</button>
+  </nav>
+
+  <!-- ===== Main Content ===== -->
+  <main id="content">
+
+    <!-- — Presets Panel — -->
+    <section id="panel-presets" class="panel active">
+      <div class="panel-header">
+        <h2>Preset Browser</h2>
+        <button id="btn-refresh-presets" class="small-btn" aria-label="Refresh presets">↻</button>
+      </div>
+
+      <input
+        type="search"
+        id="preset-search"
+        class="search-input"
+        placeholder="Search presets…"
+        autocomplete="off"
+      />
+
+      <ul id="preset-list" class="preset-list"></ul>
+    </section>
+
+    <!-- — Sound Parameters Panel — -->
+    <section id="panel-sound" class="panel">
+      <h2>Sound Parameters</h2>
+
+      <div class="param-group">
+        <label for="param-volume">Volume</label>
+        <input type="range" id="param-volume" min="0" max="1" step="0.01" value="0.8" />
+        <span class="param-value" id="val-volume">0.80</span>
+      </div>
+
+      <div class="param-group">
+        <label for="param-dynamics">Dynamics</label>
+        <input type="range" id="param-dynamics" min="0" max="1" step="0.01" value="0.5" />
+        <span class="param-value" id="val-dynamics">0.50</span>
+      </div>
+
+      <div class="param-group">
+        <label for="param-velocity">Velocity Sensitivity</label>
+        <input type="range" id="param-velocity" min="0" max="1" step="0.01" value="0.5" />
+        <span class="param-value" id="val-velocity">0.50</span>
+      </div>
+
+      <div class="param-group">
+        <label for="param-reverb">Reverb Mix</label>
+        <input type="range" id="param-reverb" min="0" max="1" step="0.01" value="0.3" />
+        <span class="param-value" id="val-reverb">0.30</span>
+      </div>
+
+      <div class="param-group">
+        <label for="param-sustain">Blooming Energy</label>
+        <input type="range" id="param-sustain" min="0" max="1" step="0.01" value="0.5" />
+        <span class="param-value" id="val-sustain">0.50</span>
+      </div>
+
+      <div class="ab-switch-container">
+        <span class="ab-label">A / B Switch</span>
+        <button id="btn-ab" class="ab-btn" aria-label="Toggle A/B">A</button>
+      </div>
+    </section>
+
+    <!-- — Playback Panel — -->
+    <section id="panel-playback" class="panel">
+      <h2>MIDI Playback</h2>
+
+      <div class="transport">
+        <button id="btn-play" class="transport-btn" aria-label="Play">▶</button>
+        <button id="btn-pause" class="transport-btn" aria-label="Pause">⏸</button>
+        <button id="btn-stop" class="transport-btn" aria-label="Stop">⏹</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== Settings Overlay ===== -->
+  <div id="settings-overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <div class="overlay-header">
+        <h2>Settings</h2>
+        <button id="btn-close-settings" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="field">
+        <label for="setting-ip">Raspberry Pi IP</label>
+        <input type="text" id="setting-ip" placeholder="192.168.1.100" />
+      </div>
+
+      <div class="field">
+        <label for="setting-port">Port</label>
+        <input type="number" id="setting-port" placeholder="8081" />
+      </div>
+
+      <button id="btn-save-settings" class="primary-btn">Save &amp; Connect</button>
+
+      <p class="hint">
+        <strong>CORS Note:</strong> If the browser blocks requests, set up an
+        nginx reverse proxy on the Pi that adds <code>Access-Control-Allow-Origin</code>
+        headers to Pianoteq's JSON-RPC port.
+      </p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
