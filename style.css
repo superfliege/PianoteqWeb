@@ -425,6 +425,26 @@ h2 {
 }
 .field input:focus { border-color: var(--accent); }
 
+/* --- Select input (settings mode) --- */
+.select-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  min-height: 44px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.select-input:focus { border-color: var(--accent); }
+
+/* --- Generic hidden utility --- */
+.hidden { display: none !important; }
+
 .hint {
   margin-top: 16px;
   font-size: 0.75rem;

@@ -11,6 +11,8 @@ const $loadingOverlay = document.getElementById('loading-overlay');
 const $settingsOverlay = document.getElementById('settings-overlay');
 const $settingIp      = document.getElementById('setting-ip');
 const $settingPort    = document.getElementById('setting-port');
+const $settingMode    = document.getElementById('setting-mode');
+const $directFields   = document.getElementById('direct-fields');
 const $btnAB          = document.getElementById('btn-ab');
 
 // ── State ───────────────────────────────────────────────────
@@ -24,13 +26,15 @@ let paramTimers   = {};         // debounce timers per parameter
 /** Read connection settings from localStorage with defaults. */
 function getSettings() {
   return {
+    mode: localStorage.getItem('ptq_mode') || 'proxy',   // 'proxy' or 'direct'
     ip:   localStorage.getItem('ptq_ip')   || '192.168.1.100',
     port: localStorage.getItem('ptq_port') || '8081'
   };
 }
 
 /** Persist connection settings to localStorage. */
-function saveSettings(ip, port) {
+function saveSettings(mode, ip, port) {
+  localStorage.setItem('ptq_mode', mode);
   localStorage.setItem('ptq_ip', ip);
   localStorage.setItem('ptq_port', port);
 }
@@ -42,11 +46,15 @@ function saveSettings(ip, port) {
  * Shows a loading spinner for longer calls and surfaces errors.
  */
 async function rpc(method, params = {}, { silent = false, showLoader = false } = {}) {
-  const { ip, port } = getSettings();
+  const { mode, ip, port } = getSettings();
   if (showLoader) showLoading(true);
 
+  // In proxy mode, call /api on the same origin (nginx handles proxying).
+  // In direct mode, call the Pianoteq host directly (requires CORS headers).
+  const url = mode === 'direct' ? `http://${ip}:${port}` : '/api';
+
   try {
-    const res = await fetch(`http://${ip}:${port}`, {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ method, params, id: Date.now() })
@@ -253,11 +261,19 @@ async function refreshInfo() {
 
 // ── Settings Panel ──────────────────────────────────────────
 
+/** Toggle visibility of direct-mode IP/port fields. */
+function updateModeUI() {
+  const isDirect = $settingMode.value === 'direct';
+  $directFields.classList.toggle('hidden', !isDirect);
+}
+
 /** Open the settings overlay and populate fields. */
 function openSettings() {
-  const { ip, port } = getSettings();
+  const { mode, ip, port } = getSettings();
+  $settingMode.value = mode;
   $settingIp.value   = ip;
   $settingPort.value = port;
+  updateModeUI();
   $settingsOverlay.classList.remove('hidden');
 }
 
@@ -268,9 +284,10 @@ function closeSettings() {
 
 /** Save settings, close overlay, and attempt initial data fetch. */
 function handleSaveSettings() {
+  const mode = $settingMode.value || 'proxy';
   const ip   = $settingIp.value.trim() || '192.168.1.100';
   const port = $settingPort.value.trim() || '8081';
-  saveSettings(ip, port);
+  saveSettings(mode, ip, port);
   closeSettings();
   showSuccess('Settings saved');
   // Re-initialize connection
@@ -285,6 +302,7 @@ function bindEvents() {
   document.getElementById('btn-settings').addEventListener('click', openSettings);
   document.getElementById('btn-close-settings').addEventListener('click', closeSettings);
   document.getElementById('btn-save-settings').addEventListener('click', handleSaveSettings);
+  $settingMode.addEventListener('change', updateModeUI);
 
   // Close settings on backdrop click
   $settingsOverlay.addEventListener('click', (e) => {
@@ -320,8 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initPresetSearch();
   bindEvents();
 
-  // Show settings on first visit (no IP configured yet)
-  if (!localStorage.getItem('ptq_ip')) {
+  // Show settings on first visit if using direct mode without IP
+  const settings = getSettings();
+  if (settings.mode === 'direct' && !localStorage.getItem('ptq_ip')) {
     openSettings();
   } else {
     init();

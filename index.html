@@ -119,21 +119,32 @@
       </div>
 
       <div class="field">
-        <label for="setting-ip">Raspberry Pi IP</label>
-        <input type="text" id="setting-ip" placeholder="192.168.1.100" />
+        <label for="setting-mode">Connection Mode</label>
+        <select id="setting-mode" class="select-input">
+          <option value="proxy">Docker Proxy (recommended)</option>
+          <option value="direct">Direct IP</option>
+        </select>
       </div>
 
-      <div class="field">
-        <label for="setting-port">Port</label>
-        <input type="number" id="setting-port" placeholder="8081" />
+      <div id="direct-fields" class="hidden">
+        <div class="field">
+          <label for="setting-ip">Pianoteq IP</label>
+          <input type="text" id="setting-ip" placeholder="192.168.1.100" />
+        </div>
+
+        <div class="field">
+          <label for="setting-port">Pianoteq Port</label>
+          <input type="number" id="setting-port" placeholder="8081" />
+        </div>
       </div>
 
       <button id="btn-save-settings" class="primary-btn">Save &amp; Connect</button>
 
       <p class="hint">
-        <strong>CORS Note:</strong> If the browser blocks requests, set up an
-        nginx reverse proxy on the Pi that adds <code>Access-Control-Allow-Origin</code>
-        headers to Pianoteq's JSON-RPC port.
+        <strong>Docker mode:</strong> Requests go through the built-in nginx
+        reverse proxy at <code>/api</code> – no CORS issues.<br>
+        <strong>Direct mode:</strong> Requires Pianoteq to send CORS headers
+        or a separate proxy.
       </p>
     </div>
   </div>
