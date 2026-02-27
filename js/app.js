@@ -13,7 +13,7 @@
     const LICENSED_PRESET_NAMES = [
         'Grand Steinway D (New York)',
         'Grand Steinway D (Hamburg)',
-        '280VC'
+        'Grand Bösendorfer 280VC'
     ];
 
     // Normalize preset names for robust matching (remove diacritics, collapse spaces, lowercase)
