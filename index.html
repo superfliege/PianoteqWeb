@@ -1,154 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Pianoteq Remote</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pianoteq Web Controller</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-music"></i> Pianoteq Web</h1>
+                <span id="version-info" class="version-badge">---</span>
+            </div>
+            <div class="header-right">
+                <div class="status-indicators">
+                    <span id="connection-status" class="status-dot disconnected" title="Verbindungsstatus"></span>
+                    <span id="cpu-load" class="cpu-badge" title="CPU-Auslastung">CPU: ---%</span>
+                    <span id="polyphony" class="poly-badge" title="Polyphonie">Poly: ---</span>
+                </div>
+                <button id="btn-panic" class="btn btn-danger" title="Panic - Alle Noten stoppen">
+                    <i class="fas fa-exclamation-triangle"></i> Panic
+                </button>
+            </div>
+        </header>
 
-  <!-- ===== Status Bar ===== -->
-  <header id="status-bar">
-    <div class="status-left">
-      <span class="logo">&#9835; Pianoteq</span>
-    </div>
-    <div class="status-center" id="current-preset" title="Current preset">—</div>
-    <div class="status-right">
-      <button id="btn-settings" class="icon-btn" aria-label="Settings">⚙</button>
-    </div>
-  </header>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar: Preset Browser -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-list"></i> Presets</h2>
+                    <button id="btn-toggle-sidebar" class="btn btn-sm btn-ghost" title="Sidebar ein-/ausklappen">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
 
-  <!-- ===== Connection indicator ===== -->
-  <div id="connection-banner" class="banner hidden"></div>
+                <!-- Search & Filter -->
+                <div class="preset-filters">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="preset-search" placeholder="Preset suchen...">
+                    </div>
+                    <div class="filter-row">
+                        <select id="filter-collection" class="filter-select">
+                            <option value="">Alle Kollektionen</option>
+                        </select>
+                        <select id="filter-class" class="filter-select">
+                            <option value="">Alle Klassen</option>
+                        </select>
+                    </div>
+                    <div class="filter-row">
+                        <select id="filter-instrument" class="filter-select">
+                            <option value="">Alle Instrumente</option>
+                        </select>
+                        <label class="filter-checkbox">
+                            <input type="checkbox" id="filter-licensed" checked>
+                            Nur lizenzierte
+                        </label>
+                    </div>
+                </div>
 
-  <!-- ===== Loading overlay ===== -->
-  <div id="loading-overlay" class="hidden">
-    <div class="spinner"></div>
-  </div>
+                <!-- Preset List -->
+                <div class="preset-list" id="preset-list">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i> Presets laden...
+                    </div>
+                </div>
 
-  <!-- ===== Navigation Tabs ===== -->
-  <nav id="tab-bar">
-    <button class="tab active" data-tab="presets">Presets</button>
-    <button class="tab" data-tab="sound">Sound</button>
-    <button class="tab" data-tab="playback">Playback</button>
-  </nav>
+                <!-- Preset Navigation -->
+                <div class="preset-nav">
+                    <button id="btn-prev-preset" class="btn btn-sm" title="Vorheriges Preset">
+                        <i class="fas fa-chevron-left"></i> Prev
+                    </button>
+                    <button id="btn-next-preset" class="btn btn-sm" title="Nächstes Preset">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </aside>
 
-  <!-- ===== Main Content ===== -->
-  <main id="content">
+            <!-- Center: Controls -->
+            <main class="center-panel">
+                <!-- Current Preset Info -->
+                <section class="card current-preset-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-sliders-h"></i> Aktuelles Preset</h2>
+                        <div class="preset-actions">
+                            <button id="btn-ab-switch" class="btn btn-sm" title="A/B Umschalten">A/B</button>
+                            <button id="btn-ab-copy" class="btn btn-sm" title="A/B Kopieren">Copy</button>
+                            <button id="btn-undo" class="btn btn-sm" title="Rückgängig"><i class="fas fa-undo"></i></button>
+                            <button id="btn-redo" class="btn btn-sm" title="Wiederholen"><i class="fas fa-redo"></i></button>
+                            <button id="btn-reset" class="btn btn-sm btn-warning" title="Preset zurücksetzen"><i class="fas fa-sync"></i> Reset</button>
+                            <button id="btn-randomize" class="btn btn-sm" title="Parameter zufällig ändern"><i class="fas fa-dice"></i></button>
+                        </div>
+                    </div>
+                    <div class="current-preset-info">
+                        <div class="preset-name-display">
+                            <span id="current-preset-name">---</span>
+                            <span id="current-preset-modified" class="modified-badge" style="display:none">Geändert</span>
+                        </div>
+                        <div class="preset-detail-row">
+                            <span class="detail-label">Instrument:</span>
+                            <span id="current-instrument">---</span>
+                        </div>
+                        <div class="preset-detail-row">
+                            <span class="detail-label">Autor:</span>
+                            <span id="current-author">---</span>
+                        </div>
+                        <div id="current-comment" class="preset-comment"></div>
+                    </div>
+                </section>
 
-    <!-- — Presets Panel — -->
-    <section id="panel-presets" class="panel active">
-      <div class="panel-header">
-        <h2>Preset Browser</h2>
-        <button id="btn-refresh-presets" class="small-btn" aria-label="Refresh presets">↻</button>
-      </div>
+                <!-- Parameter Tabs -->
+                <section class="card parameters-card">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="main-params">Haupt</button>
+                        <button class="tab" data-tab="sound-params">Klang</button>
+                        <button class="tab" data-tab="pedal-params">Pedale</button>
+                        <button class="tab" data-tab="effect-params">Effekte</button>
+                        <button class="tab" data-tab="reverb-params">Reverb</button>
+                        <button class="tab" data-tab="mic-params">Mikrofone</button>
+                        <button class="tab" data-tab="misc-params">Sonstiges</button>
+                    </div>
 
-      <input
-        type="search"
-        id="preset-search"
-        class="search-input"
-        placeholder="Search presets…"
-        autocomplete="off"
-      />
+                    <!-- Main Parameters -->
+                    <div class="tab-content active" id="main-params">
+                        <div class="param-group">
+                            <h3>Grundeinstellungen</h3>
+                            <div class="param-grid" id="params-main"></div>
+                        </div>
+                    </div>
 
-      <ul id="preset-list" class="preset-list"></ul>
-    </section>
+                    <!-- Sound Parameters -->
+                    <div class="tab-content" id="sound-params">
+                        <div class="param-group">
+                            <h3>Klangeinstellungen</h3>
+                            <div class="param-grid" id="params-sound"></div>
+                        </div>
+                    </div>
 
-    <!-- — Sound Parameters Panel — -->
-    <section id="panel-sound" class="panel">
-      <h2>Sound Parameters</h2>
+                    <!-- Pedal Parameters -->
+                    <div class="tab-content" id="pedal-params">
+                        <div class="param-group">
+                            <h3>Pedale</h3>
+                            <div class="param-grid" id="params-pedals"></div>
+                        </div>
+                    </div>
 
-      <div class="param-group">
-        <label for="param-volume">Volume</label>
-        <input type="range" id="param-volume" min="0" max="1" step="0.01" value="0.8" />
-        <span class="param-value" id="val-volume">0.80</span>
-      </div>
+                    <!-- Effect Parameters -->
+                    <div class="tab-content" id="effect-params">
+                        <div class="param-group">
+                            <h3>Effekte</h3>
+                            <div class="param-grid" id="params-effects"></div>
+                        </div>
+                    </div>
 
-      <div class="param-group">
-        <label for="param-dynamics">Dynamics</label>
-        <input type="range" id="param-dynamics" min="0" max="1" step="0.01" value="0.5" />
-        <span class="param-value" id="val-dynamics">0.50</span>
-      </div>
+                    <!-- Reverb Parameters -->
+                    <div class="tab-content" id="reverb-params">
+                        <div class="param-group">
+                            <h3>Reverb</h3>
+                            <div class="param-grid" id="params-reverb"></div>
+                        </div>
+                    </div>
 
-      <div class="param-group">
-        <label for="param-velocity">Velocity Sensitivity</label>
-        <input type="range" id="param-velocity" min="0" max="1" step="0.01" value="0.5" />
-        <span class="param-value" id="val-velocity">0.50</span>
-      </div>
+                    <!-- Mic Parameters -->
+                    <div class="tab-content" id="mic-params">
+                        <div class="param-group">
+                            <h3>Mikrofone</h3>
+                            <div class="param-grid" id="params-mics"></div>
+                        </div>
+                    </div>
 
-      <div class="param-group">
-        <label for="param-reverb">Reverb Mix</label>
-        <input type="range" id="param-reverb" min="0" max="1" step="0.01" value="0.3" />
-        <span class="param-value" id="val-reverb">0.30</span>
-      </div>
+                    <!-- Misc Parameters -->
+                    <div class="tab-content" id="misc-params">
+                        <div class="param-group">
+                            <h3>Sonstige Parameter</h3>
+                            <div class="param-grid" id="params-misc"></div>
+                        </div>
+                    </div>
+                </section>
 
-      <div class="param-group">
-        <label for="param-sustain">Blooming Energy</label>
-        <input type="range" id="param-sustain" min="0" max="1" step="0.01" value="0.5" />
-        <span class="param-value" id="val-sustain">0.50</span>
-      </div>
+                <!-- MIDI Piano Keyboard -->
+                <section class="card keyboard-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-keyboard"></i> Klaviatur</h2>
+                        <div class="keyboard-controls">
+                            <label>Oktave: 
+                                <select id="keyboard-octave">
+                                    <option value="2">C2</option>
+                                    <option value="3">C3</option>
+                                    <option value="4" selected>C4</option>
+                                    <option value="5">C5</option>
+                                    <option value="6">C6</option>
+                                </select>
+                            </label>
+                            <label>Velocity: 
+                                <input type="range" id="keyboard-velocity" min="1" max="127" value="80">
+                                <span id="velocity-display">80</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="piano-keyboard" id="piano-keyboard"></div>
+                </section>
 
-      <div class="ab-switch-container">
-        <span class="ab-label">A / B Switch</span>
-        <button id="btn-ab" class="ab-btn" aria-label="Toggle A/B">A</button>
-      </div>
-    </section>
+                <!-- MIDI Transport -->
+                <section class="card transport-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-play-circle"></i> MIDI Transport</h2>
+                    </div>
+                    <div class="transport-controls">
+                        <div class="transport-buttons">
+                            <button id="btn-rewind" class="btn btn-transport" title="Zurückspulen">
+                                <i class="fas fa-fast-backward"></i>
+                            </button>
+                            <button id="btn-stop" class="btn btn-transport" title="Stopp">
+                                <i class="fas fa-stop"></i>
+                            </button>
+                            <button id="btn-play" class="btn btn-transport" title="Abspielen">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button id="btn-pause" class="btn btn-transport" title="Pause">
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button id="btn-record" class="btn btn-transport btn-record" title="Aufnehmen">
+                                <i class="fas fa-circle"></i>
+                            </button>
+                        </div>
+                        <div class="transport-info">
+                            <div class="sequencer-info">
+                                <span id="seq-name" class="seq-name">---</span>
+                                <span id="seq-position" class="seq-position">0:00 / 0:00</span>
+                            </div>
+                            <div class="transport-seek">
+                                <input type="range" id="seek-slider" min="0" max="100" value="0" step="0.1">
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- — Playback Panel — -->
-    <section id="panel-playback" class="panel">
-      <h2>MIDI Playback</h2>
-
-      <div class="transport">
-        <button id="btn-play" class="transport-btn" aria-label="Play">▶</button>
-        <button id="btn-pause" class="transport-btn" aria-label="Pause">⏸</button>
-        <button id="btn-stop" class="transport-btn" aria-label="Stop">⏹</button>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ===== Settings Overlay ===== -->
-  <div id="settings-overlay" class="overlay hidden">
-    <div class="overlay-content">
-      <div class="overlay-header">
-        <h2>Settings</h2>
-        <button id="btn-close-settings" class="icon-btn" aria-label="Close">✕</button>
-      </div>
-
-      <div class="field">
-        <label for="setting-mode">Connection Mode</label>
-        <select id="setting-mode" class="select-input">
-          <option value="proxy">Docker Proxy (recommended)</option>
-          <option value="direct">Direct IP</option>
-        </select>
-      </div>
-
-      <div id="direct-fields" class="hidden">
-        <div class="field">
-          <label for="setting-ip">Pianoteq IP</label>
-          <input type="text" id="setting-ip" placeholder="192.168.1.100" />
+                    <!-- Metronome -->
+                    <div class="metronome-section">
+                        <div class="metronome-header">
+                            <h3><i class="fas fa-drum"></i> Metronom</h3>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="metronome-enabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="metronome-controls">
+                            <label>BPM: 
+                                <input type="number" id="metronome-bpm" min="20" max="300" value="120" class="small-input">
+                            </label>
+                            <label>Taktart: 
+                                <select id="metronome-timesig" class="small-select">
+                                    <option value="2/4">2/4</option>
+                                    <option value="3/4">3/4</option>
+                                    <option value="4/4" selected>4/4</option>
+                                    <option value="5/4">5/4</option>
+                                    <option value="6/8">6/8</option>
+                                    <option value="7/8">7/8</option>
+                                </select>
+                            </label>
+                            <label>Lautstärke: 
+                                <input type="range" id="metronome-volume" min="-40" max="10" value="0" step="1">
+                                <span id="metronome-volume-display">0 dB</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="metronome-accentuate" checked> Betonung
+                            </label>
+                        </div>
+                    </div>
+                </section>
+            </main>
         </div>
 
-        <div class="field">
-          <label for="setting-port">Pianoteq Port</label>
-          <input type="number" id="setting-port" placeholder="8081" />
-        </div>
-      </div>
-
-      <button id="btn-save-settings" class="primary-btn">Save &amp; Connect</button>
-
-      <p class="hint">
-        <strong>Docker mode:</strong> Requests go through the built-in nginx
-        reverse proxy at <code>/api</code> – no CORS issues.<br>
-        <strong>Direct mode:</strong> Requires Pianoteq to send CORS headers
-        or a separate proxy.
-      </p>
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
     </div>
-  </div>
 
-  <script src="app.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/keyboard.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

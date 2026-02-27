@@ -56,6 +56,95 @@ PianoteqWeb/
 └── readme.md
 ```
 
+## Pianoteq starten (JSON-RPC Server)
+
+Damit die Web-App mit Pianoteq kommunizieren kann, muss Pianoteq mit aktiviertem **JSON-RPC HTTP-Server** gestartet werden. Pianoteq bietet dafür die Kommandozeilenparameter `--headless` und `--serve`.
+
+### Auf dem Desktop (mit GUI)
+
+Pianoteq mit JSON-RPC-Server starten, während die grafische Oberfläche sichtbar bleibt:
+
+```bash
+# Linux
+sudo ./Pianoteq9 --serve "0.0.0.0:8081" --headless
+"./Pianoteq 9 Stage" --serve 0.0.0.0:8081
+
+# macOS
+open -a "Pianoteq 9 Stage" --args --serve 0.0.0.0:8081
+
+# Windows (PowerShell)
+& "C:\Program Files\Modartt\Pianoteq 9 Stage\Pianoteq 9 Stage.exe" --serve 0.0.0.0:8081
+```
+
+### Headless (ohne GUI, z. B. Raspberry Pi)
+
+Für den Betrieb ohne Monitor/Desktop – ideal für einen Raspberry Pi:
+
+```bash
+"./Pianoteq 9 Stage" --headless --serve 0.0.0.0:8081
+```
+
+### Parameter-Erklärung
+
+| Parameter | Beschreibung |
+|---|---|
+| `--headless` | Startet Pianoteq ohne grafische Oberfläche (kein X11/Wayland nötig) |
+| `--serve <ip>:<port>` | Aktiviert den eingebauten JSON-RPC HTTP-Server auf der angegebenen Adresse und Port |
+| `0.0.0.0` | Lauscht auf **allen** Netzwerk-Interfaces (erreichbar von anderen Geräten im Netzwerk) |
+| `127.0.0.1` | Lauscht nur lokal (nur vom selben Rechner erreichbar) |
+| `8081` | Port – muss mit `PIANOTEQ_PORT` in `docker-compose.yml` übereinstimmen |
+
+### Autostart auf dem Raspberry Pi (systemd)
+
+Um Pianoteq beim Booten automatisch zu starten, eine systemd-Unit anlegen:
+
+```bash
+sudo nano /etc/systemd/system/pianoteq.service
+```
+
+Inhalt:
+
+```ini
+[Unit]
+Description=Pianoteq 9 Stage (headless JSON-RPC)
+After=network.target sound.target
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/home/pi/Pianoteq 9 Stage/arm/Pianoteq 9 Stage --headless --serve 0.0.0.0:8081
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Aktivieren und starten:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable pianoteq
+sudo systemctl start pianoteq
+
+# Status prüfen
+sudo systemctl status pianoteq
+```
+
+### Verbindung testen
+
+Prüfe ob der JSON-RPC-Server läuft, indem du von einem anderen Gerät im Netzwerk folgenden Befehl ausführst:
+
+```bash
+curl -X POST http://<PIANOTEQ_IP>:8081 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"getListOfPresets","params":{},"id":1}'
+```
+
+Wenn alles funktioniert, erhältst du eine JSON-Antwort mit der Liste aller verfügbaren Presets.
+
+---
+
 ## Quick Start (Docker)
 
 ### 1. Configure
