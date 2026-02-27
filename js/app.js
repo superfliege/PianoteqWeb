@@ -13,7 +13,7 @@
     const LICENSED_PRESET_NAMES = [
         'Grand Steinway D (New York)',
         'Grand Steinway D (Hamburg)',
-        'Grand Bösendorfer 280BC'
+        '280VC'
     ];
 
     // Normalize preset names for robust matching (remove diacritics, collapse spaces, lowercase)
@@ -70,7 +70,7 @@
             // Presets — filter to licensed list only (use normalized comparison)
             if (presets) {
                 const licensedSet = new Set(LICENSED_PRESET_NAMES.map(n => normalizePresetName(n)));
-                const licensedPresets = presets.filter(p => licensedSet.has(normalizePresetName(p.name)));
+                const licensedPresets = presets.filter(p => licensedSet.has(normalizePresetName(p.instr)));
                 ui.renderPresetList(licensedPresets, onPresetSelect);
                 ui.bindPresetFilters(onPresetSelect);
                 ui.updatePresetDetails(licensedPresets);
