@@ -262,7 +262,6 @@ class PianoteqUI {
             if (collection && p.collection !== collection) return false;
             if (cls && p.class !== cls) return false;
             if (instr && p.instr !== instr) return false;
-            if (licensedOnly && p.license_status === 'demo') return false;
             return true;
         });
 

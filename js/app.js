@@ -5,9 +5,24 @@
 (function () {
     'use strict';
 
-    const PIANOTEQ_URL = 'http://172.23.28.77:8081';
+    const PIANOTEQ_URL = 'http://192.168.178.50:8081';
     const POLL_INTERVAL_FAST = 1500;  // For perf info, sequencer
     const POLL_INTERVAL_SLOW = 5000;  // For preset changes
+
+    // Only show these licensed presets in the UI
+    const LICENSED_PRESET_NAMES = [
+        'Grand Steinway D (New York)',
+        'Grand Steinway D (Hamburg)',
+        'Grand Bösendorfer 280BC'
+    ];
+
+    // Normalize preset names for robust matching (remove diacritics, collapse spaces, lowercase)
+    function normalizePresetName(name) {
+        if (!name || typeof name !== 'string') return '';
+        const noDiacritics = name.normalize('NFD').replace(/\p{Diacritic}/gu, '');
+        const collapsed = noDiacritics.replace(/\s+/g, ' ').trim();
+        return collapsed.toLowerCase();
+    }
 
     let api, ui, keyboard;
     let pollFastTimer = null;
@@ -52,13 +67,21 @@
             ui.updateCurrentPreset(info);
             lastPresetName = ui.currentPresetName;
 
-            // Presets
+            // Presets — filter to licensed list only (use normalized comparison)
             if (presets) {
-                ui.renderPresetList(presets, onPresetSelect);
+                const licensedSet = new Set(LICENSED_PRESET_NAMES.map(n => normalizePresetName(n)));
+                const licensedPresets = presets.filter(p => licensedSet.has(normalizePresetName(p.name)));
+                ui.renderPresetList(licensedPresets, onPresetSelect);
                 ui.bindPresetFilters(onPresetSelect);
-                ui.updatePresetDetails(presets);
+                ui.updatePresetDetails(licensedPresets);
                 ui.highlightActivePreset();
                 presetsLoaded = true;
+                if (licensedPresets.length === 0) {
+                    ui.showToast('Keine lizenzierten Presets gefunden', 'warning', 4000);
+                    console.warn('Licensed preset filter found 0 matches. Available presets count:', presets.length);
+                } else {
+                    console.info('Licensed preset filter matched', licensedPresets.length, 'presets');
+                }
             }
 
             // Parameters
