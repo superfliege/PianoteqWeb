@@ -111,11 +111,16 @@ class PianoteqUI {
     // ========== Sidebar Toggle ==========
 
     _initSidebarToggle() {
+        const btnOpen = document.getElementById('btn-open-sidebar');
+
         this.elements.btnToggleSidebar.addEventListener('click', () => {
-            this.elements.sidebar.classList.toggle('collapsed');
-            const icon = this.elements.btnToggleSidebar.querySelector('i');
-            icon.classList.toggle('fa-chevron-left');
-            icon.classList.toggle('fa-chevron-right');
+            this.elements.sidebar.classList.add('collapsed');
+            btnOpen.classList.add('visible');
+        });
+
+        btnOpen.addEventListener('click', () => {
+            this.elements.sidebar.classList.remove('collapsed');
+            btnOpen.classList.remove('visible');
         });
     }
 

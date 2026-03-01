@@ -281,10 +281,8 @@
     async function onPresetSelect(name, bank) {
         try {
             ui.showToast(`Lade: ${name}...`, 'info', 1500);
-            // loadPreset places the preset into the inactive A/B slot
+            // loadPreset loads the preset into the active slot directly
             await api.loadPreset(name, bank);
-            // activate the slot that was just loaded
-            await api.abSwitch();
 
             // verify active preset and then refresh UI/state
             const info = await api.getInfo();

@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="spotlight" cx="50%" cy="30%" r="70%" fx="50%" fy="30%">
+      <stop offset="0%" stop-color="#1a1510" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
+    </radialGradient>
+    <linearGradient id="pianoBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1510"/>
+      <stop offset="50%" stop-color="#0d0b08"/>
+      <stop offset="100%" stop-color="#141210"/>
+    </linearGradient>
+    <linearGradient id="pianoShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.08"/>
+      <stop offset="50%" stop-color="#c9a96e" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="legGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1510"/>
+      <stop offset="100%" stop-color="#0a0806"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="15" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="#090807"/>
+  <rect width="1920" height="1080" fill="url(#spotlight)"/>
+  
+  <!-- Floor reflection area -->
+  <ellipse cx="960" cy="980" rx="700" ry="80" fill="#0d0b08" opacity="0.5"/>
+  
+  <!-- Grand Piano - Top View Silhouette -->
+  <g transform="translate(960, 480) scale(0.85)" filter="url(#softShadow)" opacity="0.35">
+    <!-- Piano body outline - grand piano shape -->
+    <path d="M-350,-250 
+             C-350,-250 -340,-380 -200,-420 
+             C-60,-460 100,-440 200,-400 
+             C300,-360 380,-280 400,-180 
+             C420,-80 420,60 400,160 
+             C380,260 320,340 240,380 
+             C160,420 60,430 -40,420 
+             L-40,420 L-40,-250 Z" 
+          fill="url(#pianoBody)" stroke="#1f1a14" stroke-width="2"/>
+    
+    <!-- Piano lid -->
+    <path d="M-350,-250 
+             C-350,-250 -340,-380 -200,-420 
+             C-60,-460 100,-440 200,-400 
+             C300,-360 380,-280 400,-180 
+             C420,-80 420,60 400,160 
+             C380,260 320,340 240,380 
+             C160,420 60,430 -40,420 
+             L-40,420 L-40,-250 Z" 
+          fill="url(#pianoShine)"/>
+    
+    <!-- Keyboard area -->
+    <rect x="-40" y="-250" width="28" height="670" fill="#0f0d0a" rx="2"/>
+    
+    <!-- Keys suggestion -->
+    <g opacity="0.3">
+      <rect x="-38" y="-240" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-228" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-216" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-204" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-192" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-180" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <rect x="-38" y="-168" width="24" height="8" fill="#e8e0d0" rx="1"/>
+      <!-- Black keys -->
+      <rect x="-38" y="-235" width="14" height="6" fill="#1a1510" rx="1"/>
+      <rect x="-38" y="-223" width="14" height="6" fill="#1a1510" rx="1"/>
+      <rect x="-38" y="-199" width="14" height="6" fill="#1a1510" rx="1"/>
+      <rect x="-38" y="-187" width="14" height="6" fill="#1a1510" rx="1"/>
+      <rect x="-38" y="-175" width="14" height="6" fill="#1a1510" rx="1"/>
+    </g>
+    
+    <!-- Strings suggestion -->
+    <g opacity="0.06" stroke="#c9a96e" stroke-width="0.5">
+      <line x1="-20" y1="-240" x2="380" y2="-160"/>
+      <line x1="-20" y1="-220" x2="390" y2="-120"/>
+      <line x1="-20" y1="-200" x2="400" y2="-80"/>
+      <line x1="-20" y1="-180" x2="410" y2="-40"/>
+      <line x1="-20" y1="-160" x2="415" y2="0"/>
+      <line x1="-20" y1="-140" x2="410" y2="40"/>
+      <line x1="-20" y1="-120" x2="400" y2="80"/>
+      <line x1="-20" y1="-100" x2="390" y2="120"/>
+      <line x1="-20" y1="-80" x2="370" y2="160"/>
+      <line x1="-20" y1="-60" x2="350" y2="200"/>
+      <line x1="-20" y1="-40" x2="320" y2="240"/>
+      <line x1="-20" y1="-20" x2="280" y2="280"/>
+      <line x1="-20" y1="0" x2="240" y2="320"/>
+      <line x1="-20" y1="20" x2="200" y2="340"/>
+      <line x1="-20" y1="40" x2="160" y2="360"/>
+      <line x1="-20" y1="60" x2="120" y2="370"/>
+      <line x1="-20" y1="80" x2="80" y2="380"/>
+      <line x1="-20" y1="100" x2="40" y2="390"/>
+      <line x1="-20" y1="120" x2="0" y2="400"/>
+    </g>
+    
+    <!-- Gold rim accent -->
+    <path d="M-350,-250 
+             C-350,-250 -340,-380 -200,-420 
+             C-60,-460 100,-440 200,-400 
+             C300,-360 380,-280 400,-180 
+             C420,-80 420,60 400,160 
+             C380,260 320,340 240,380 
+             C160,420 60,430 -40,420" 
+          fill="none" stroke="#c9a96e" stroke-width="1" opacity="0.15"/>
+    
+    <!-- Legs -->
+    <rect x="-38" y="400" width="8" height="120" fill="url(#legGrad)" rx="3" opacity="0.8"/>
+    <rect x="340" y="-100" width="8" height="120" fill="url(#legGrad)" rx="3" opacity="0.6" transform="rotate(15, 340, -100)"/>
+    <rect x="180" y="360" width="8" height="120" fill="url(#legGrad)" rx="3" opacity="0.7" transform="rotate(-5, 180, 360)"/>
+  </g>
+  
+  <!-- Subtle decorative music notes floating -->
+  <g opacity="0.04" fill="#c9a96e">
+    <text x="200" y="200" font-size="60" font-family="serif">&#9835;</text>
+    <text x="1600" y="300" font-size="45" font-family="serif">&#9834;</text>
+    <text x="300" y="800" font-size="35" font-family="serif">&#9833;</text>
+    <text x="1500" y="750" font-size="50" font-family="serif">&#9835;</text>
+    <text x="800" y="150" font-size="30" font-family="serif">&#9834;</text>
+  </g>
+  
+  <!-- Subtle vignette overlay -->
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="transparent"/>
+    <stop offset="100%" stop-color="#000" stop-opacity="0.4"/>
+  </radialGradient>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+</svg>
